@@ -131,39 +131,30 @@ public class FlexBox extends Pane {
 
 	static Object getConstraint(Node node, Object key) {
 		if (node.hasProperties()) {
-			Object value = node.getProperties().get(key);
-			if (value != null) {
-				return value;
-			}
+			return node.getProperties().get(key);
 		}
 		return null;
 	}
 
-
 	@Override
 	protected double computeMinHeight(double width) {
-		//return super.computeMinHeight(width);
 		return computedMinHeight;
 	}
 
 	@Override
 	protected double computePrefHeight(double width) {
-//        return super.computePrefHeight(width);
 		return computedMinHeight;
 	}
 
 	@Override
 	protected void layoutChildren() {
-		//System.out.println("layoutChildren");
-		//super.layoutChildren();
-
 		long timeStart = System.nanoTime();
 
 		grid.clear();
 
 		List<FlexBoxItem> nodesList = new ArrayList<>();
 
-		/**
+		/*
 		 * First we transform all Nodes to a FlexBoxItem for caching purposes.
 		 */
 		for (Node node : getManagedChildren()) {
@@ -175,10 +166,7 @@ public class FlexBox extends Pane {
 		if (getDirection().equals(FlexBoxDirection.ROW) || getDirection().equals(FlexBoxDirection.ROW_REVERSE))
 		{
 			layoutChildrenForRowDirection(nodesList);
-		}/* else if (getDirection().equals(FlexBoxDirection.COLUMN) || getDirection().equals(FlexBoxDirection.COLUMN_REVERSE))
-		{
-			layoutChildrenForColumnDirection(nodesList);
-		}*/
+		}
 
 		long duration = System.nanoTime() - timeStart;
 		if (verbose) {
@@ -186,73 +174,13 @@ public class FlexBox extends Pane {
 		}
 	}
 
-	/*private void layoutChildrenForColumnDirection(List<FlexBoxItem> nodesList) {
-		double w = getWidth();
-		double growWidth = w - getPadding().getLeft() - getPadding().getRight();
-
-		//  double lastX2 = 0;
-		int row = 0;
-		int i = 0;
-
-		ListIterator<Node> nodeIterator = null;
-		if (getDirection().equals(FlexBoxDirection.COLUMN_REVERSE)) {
-			nodeIterator = new ReverseListIterator<Node>(getManagedChildren());
-		} else {
-			nodeIterator = getManagedChildren().listIterator();
-		}
-
-		for (FlexBoxItem flexBoxItem : nodesList) {
-			FlexBoxRow flexBoxRow = new FlexBoxRow();
-			flexBoxRow.addFlexBoxItem(flexBoxItem);
-			addToGrid(row, flexBoxRow);
-			row++;
-			i++;
-		}
-
-		if (verbose) {
-			System.out.println("grid = " + grid);
-		}
-
-
-		//Rows durchgehen und width berechnen
-		double lastY2 = getPadding().getTop();
-		i = 0;
-		int noGridRows = grid.size();
-
-		//iterate all rows and calculate node sizes and positions
-		for (Integer rowIndex : grid.keySet()) {
-			//contains all nodes per row
-			FlexBoxRow flexBoxRow = grid.get(rowIndex);
-			ArrayList<FlexBoxItem> rowNodes = flexBoxRow.getNodes();
-			double rowNodeX2 = 0;
-			double lastMaxHeight = 0;
-			//iterate node of row
-			for (FlexBoxItem flexBoxItem : rowNodes) {
-				double rowNodeMinWidth = flexBoxItem.node.minWidth(10);
-				double rowNodeMaxWidth = flexBoxItem.node.maxWidth(10);
-				double rowNodeWidth = Math.min(rowNodeMaxWidth, Math.max(growWidth, rowNodeMinWidth));
-
-				double h = flexBoxItem.node.prefHeight(growWidth);
-				flexBoxItem.node.resizeRelocate(rowNodeX2, lastY2, rowNodeWidth, h);
-
-				lastMaxHeight = Math.max(lastMaxHeight, h);
-
-				rowNodeX2 = rowNodeX2 + rowNodeWidth + getHorizontalSpace();
-			}
-
-			lastY2 = lastY2 + lastMaxHeight;
-			if (i + 1 < noGridRows) {
-				lastY2 += getVerticalSpace();
-			}
-			i++;
-		}
-	}*/
-
 	private void layoutChildrenForRowDirection(List<FlexBoxItem> nodesList) {
 		performingLayout = true;
 
 		double paddings = getPadding().getLeft() + getPadding().getRight();
 		double w = getWidth() - paddings;
+
+		if(w <= 0) return;
 
 		nodesList.forEach(flexBoxItem -> {
 			flexBoxItem.minWidth = flexBoxItem.node.minWidth(10);

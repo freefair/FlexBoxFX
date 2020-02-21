@@ -1,11 +1,21 @@
+buildscript {
+  dependencies {
+    classpath 'com.google.gradle:osdetector-gradle-plugin:1.6.0'
+  }
+}
+
+plugins {
+  id 'java-library'
+  id 'maven'
+  id 'signing'
+}
+
 group 'com.onexip'
 version '0.1.5.3-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
   gradleVersion = '4.2.1'
 }
-
-apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
@@ -16,17 +26,19 @@ repositories {
   }
 }
 
+ext.platform = osdetector.os == 'osx' ? 'mac' : osdetector.os == 'windows' ? 'win' : osdetector.os
+
 dependencies {
-  compile('org.apache.commons:commons-collections4:4.1')
+  api('org.apache.commons:commons-collections4:4.1')
+  api "org.openjfx:javafx-base:13.0.2:$platform"
+  api "org.openjfx:javafx-graphics:13.0.2:$platform"
+  api "org.openjfx:javafx-controls:13.0.2:$platform"
 
-  testCompile('com.miglayout:miglayout-javafx:5.1.1-SNAPSHOT')
-  testCompile group: 'junit', name: 'junit', version: '4.12'
-  testCompile("org.testfx:testfx-core:4.0.8-alpha")
-  testCompile("org.testfx:testfx-junit:4.0.8-alpha")
+  testImplementation 'com.miglayout:miglayout-javafx:5.2'
+  testImplementation group: 'junit', name: 'junit', version: '4.12'
+  testImplementation "org.testfx:testfx-core:4.0.8-alpha"
+  testImplementation "org.testfx:testfx-junit:4.0.8-alpha"
 }
-
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 task javadocJar(type: Jar) {
   classifier = 'javadoc'
